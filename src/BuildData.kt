@@ -8,19 +8,17 @@ fun main(args: Array<String>) {
     val outputDir = args[1]
 
     val imageFiles = JavaCvUtils.getAllFilesInDirectory(inputDir)
-    val faces = ArrayList<Face>()
 
     imageFiles?.forEach {
         val image = JavaCvUtils.imreadGray(it.absolutePath)
-        val faceImagesDetected = Detection.detect(image)
-        if (faceImagesDetected != null) {
-            var preprocessedFaceImage = Preprocessing.scaleToStandardSize(faceImagesDetected)
-            faces.add(Face(preprocessedFaceImage, it.name))
+        val faceImageDetected = Detection.detect(image)
+        if (faceImageDetected != null) {
+            val scaledFaceImage = Preprocessing.scaleToStandardSize(faceImageDetected)
+
+            val face = Face(scaledFaceImage, it.name)
+            face.save("$outputDir/aligned_${face.containerImageName}")
         }
     }
 
-    faces.forEach {
-        it.save("$outputDir/aligned_${it.containerImageName}")
-    }
 }
 
