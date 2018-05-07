@@ -16,6 +16,7 @@ object Detection {
         println("Number of face detected in images: " + faces.size())
 
         val face = when {
+            faces.size() == 1L -> Mat(imgGray, faces.get(0))
             faces.size() > 1 -> {
                 println("More than one face detected.")
                 var maxFaceIndex: Long = -1

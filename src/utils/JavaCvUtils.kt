@@ -1,11 +1,11 @@
 package utils
 
-import org.bytedeco.javacpp.opencv_core
 import org.bytedeco.javacpp.opencv_core.Mat
 import org.bytedeco.javacpp.opencv_core.MatVector
 import org.bytedeco.javacpp.opencv_imgcodecs.imread
 import org.bytedeco.javacpp.opencv_imgcodecs.imwrite
-import org.bytedeco.javacpp.opencv_imgproc.*
+import org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY
+import org.bytedeco.javacpp.opencv_imgproc.cvtColor
 import org.bytedeco.javacv.CanvasFrame
 import org.bytedeco.javacv.OpenCVFrameConverter
 import java.io.File
@@ -46,12 +46,6 @@ object JavaCvUtils {
             matVector.put(counter.toLong(), mat)
         }
         return matVector
-    }
-
-    fun imresize(src: Mat): Mat {
-        val dest = Mat()
-        resize(src, dest, opencv_core.Size(160, 160))
-        return dest
     }
 
     fun imsave(path: String, image: Mat) {
