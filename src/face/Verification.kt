@@ -14,6 +14,15 @@ class Verification {
 
     private val mRecognizer: FaceRecognizer = EigenFaceRecognizer.create(128, 10000.0)
 
+    fun load(trainedResult: String) {
+        mRecognizer.read(trainedResult)
+    }
+
+    fun save(path: String) {
+        mRecognizer.save(path)
+    }
+
+
     fun train(faces: List<Face>) {
         val labels = generateLabels(faces)
         val faceImageList = faces.map { it.image }

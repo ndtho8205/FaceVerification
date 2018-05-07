@@ -11,6 +11,7 @@ fun main(args: Array<String>) {
 
     val verifier = Verification()
     verifier.train(trainingFaces)
+    verifier.save("/home/ndtho/Desktop/eigenfaces_trained.yml")
     verifier.predict(testFaces)
 }
 
