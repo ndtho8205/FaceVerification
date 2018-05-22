@@ -1,4 +1,4 @@
-import face.Verification
+import face.FaceVerification
 
 fun main(args: Array<String>) {
     val trainedResult = args[0]
@@ -6,7 +6,7 @@ fun main(args: Array<String>) {
 
     val testFaces = getAllFaceImagesFromDir(testDir)
 
-    val verifier = Verification()
+    val verifier = FaceVerification()
     verifier.load(trainedResult)
     verifier.predict(testFaces)
 }

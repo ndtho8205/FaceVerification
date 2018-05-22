@@ -1,6 +1,6 @@
 import face.Face
-import face.Verification
-import utils.JavaCvUtils
+import face.FaceVerification
+import face.JavaCvUtils
 
 fun main(args: Array<String>) {
     val trainingDir = args[0]
@@ -9,7 +9,7 @@ fun main(args: Array<String>) {
     val trainingFaces = getAllFaceImagesFromDir(trainingDir)
     val testFaces = getAllFaceImagesFromDir(testDir)
 
-    val verifier = Verification()
+    val verifier = FaceVerification()
     verifier.train(trainingFaces)
     verifier.save("/home/ndtho/Desktop/eigenfaces_trained.yml")
     verifier.predict(testFaces)
@@ -21,7 +21,7 @@ fun getAllFaceImagesFromDir(imageDir: String): List<Face> {
 
     faceImageFiles?.forEach {
         val faceImage = JavaCvUtils.imreadGray(it.absolutePath)
-        val face = Face(faceImage, it.name)
+        val face = Face(faceImage, Face.BoundingBox(0,0,0,0), it.name)
         faces.add(face)
     }
 

@@ -1,9 +1,9 @@
-import face.Detection
-import face.Face
-import face.Preprocessing
-import utils.JavaCvUtils
+import face.FaceDetection
+import face.FacePreprocessing
+import face.JavaCvUtils
 
-fun main(args: Array<String>) {
+fun main(args: Array<String>)
+{
     val inputDir = args[0]
     val outputDir = args[1]
 
@@ -11,12 +11,12 @@ fun main(args: Array<String>) {
 
     imageFiles?.forEach {
         val image = JavaCvUtils.imreadGray(it.absolutePath)
-        val faceImageDetected = Detection.detect(image)
-        if (faceImageDetected != null) {
-            val scaledFaceImage = Preprocessing.scaleToStandardSize(faceImageDetected)
+        val faceImageDetected = FaceDetection.detect(image)
+        if (faceImageDetected != null)
+        {
+            FacePreprocessing.scaleToStandardSize(faceImageDetected)
 
-            val face = Face(scaledFaceImage, it.name)
-            face.save("$outputDir/aligned_${face.containerImageName}")
+            faceImageDetected.save("$outputDir/aligned_${faceImageDetected.containerImageName}")
         }
     }
 
