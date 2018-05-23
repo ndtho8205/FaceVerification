@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
 }
 
 fun getAllFaceImagesFromDir(imageDir: String): List<Face> {
-    val faceImageFiles = JavaCvUtils.getAllFilesInDirectory(imageDir)
+    val faceImageFiles = JavaCvUtils.getAllImageFilesInDirectory(imageDir)
     val faces = ArrayList<Face>()
 
     faceImageFiles?.forEach {

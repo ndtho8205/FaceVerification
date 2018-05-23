@@ -32,7 +32,7 @@ object JavaCvUtils
         return img
     }
 
-    fun getAllFilesInDirectory(filesDir: String): Array<File>?
+    fun getAllImageFilesInDirectory(filesDir: String): List<File>?
     {
         val root = File(filesDir)
 
@@ -40,7 +40,7 @@ object JavaCvUtils
             name.toLowerCase().endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".pgm")
         }
 
-        return root.listFiles(imageFilter)
+        return root.listFiles(imageFilter).sortedWith(compareBy({ it.name }))
     }
 
     fun list2MatVector(list: List<Mat>): MatVector?

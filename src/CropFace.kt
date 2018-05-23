@@ -7,7 +7,7 @@ fun main(args: Array<String>)
     val inputDir = args[0]
     val outputDir = args[1]
 
-    val imageFiles = JavaCvUtils.getAllFilesInDirectory(inputDir)
+    val imageFiles = JavaCvUtils.getAllImageFilesInDirectory(inputDir)
 
     imageFiles?.forEach {
         val image = JavaCvUtils.imreadGray(it.absolutePath)
