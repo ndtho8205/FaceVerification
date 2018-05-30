@@ -1,16 +1,37 @@
 package face
 
 import org.bytedeco.javacpp.opencv_core.Mat
+import org.bytedeco.javacpp.opencv_imgproc.COLOR_RGB2BGR
+import org.bytedeco.javacpp.opencv_imgproc.cvtColor
 
-data class Face(val image: Mat, val boundingBox: BoundingBox, val containerImageName: String)
+data class Face(val containerImage: Mat,
+                val faceImageName: String,
+                val faceImage: Mat)
 {
 
-    var alignedImage: Mat = image
+    val alignedFaceImage: Mat
 
-    fun save(filePath: String)
+    init
     {
-        JavaCvUtils.imsave(filePath, image)
+        alignedFaceImage = preprocessing(faceImage)
     }
 
-    data class BoundingBox(val x: Int, val y: Int, val w: Int, val h: Int)
+    fun save(path: String)
+    {
+        val faceImagePath = "$path/${faceImageName}_face"
+        val containerImagePath = "$path/${faceImageName}_container"
+
+        JavaCvUtils.imsave(faceImagePath, alignedFaceImage)
+
+        val bgrImage = Mat()
+        cvtColor(containerImage, bgrImage, COLOR_RGB2BGR)
+        JavaCvUtils.imsave(containerImagePath, bgrImage)
+    }
+
+    private fun preprocessing(faceImage: Mat): Mat
+    {
+        val preprocessor = ImagePreprocessing()
+        val aligned = preprocessor.scaleToStandardSize(faceImage)
+        return aligned
+    }
 }
