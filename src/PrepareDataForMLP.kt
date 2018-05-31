@@ -4,12 +4,15 @@ import face.FaceQualityComputation
 import face.FaceVerification
 import face.JavaCvUtils
 import models.FaceData
+import models.VoiceData
 import voice.SerializeArray
 import voice.VoiceAuthenticator
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
+import java.util.logging.Logger
 
+val logger = Logger.getLogger("PrepareDataForMLP")
 val MODEL_DIR = "/home/ndtho8205/Desktop/BioDiaryData/train"
 
 /*
@@ -53,10 +56,12 @@ fun main(args: Array<String>)
                 val label = it.fileName.toString().split("_")[0]
 
                 val labelFaceDirectoryPath = Paths.get(it.toString(), "Face").toString()
-                processFaceDirectory(labelFaceDirectoryPath, faceVerifier, if (label == classname) 1 else 0)
+                val faceData =
+                        processFaceDirectory(labelFaceDirectoryPath, faceVerifier, if (label == classname) 1 else 0)
 
-                val labelVoiceirectoryPath = Paths.get(it.toString(), "Voice").toString()
-                processVoiceDirectory(labelVoiceirectoryPath, voiceVerifier, if (label == classname) 1 else 0)
+                val labelVoiceDirectoryPath = Paths.get(it.toString(), "Voice").toString()
+                val voiceData =
+                        processVoiceDirectory(labelVoiceDirectoryPath, voiceVerifier, if (label == classname) 1 else 0)
 
             }
         }
@@ -64,7 +69,7 @@ fun main(args: Array<String>)
 
 }
 
-fun processFaceDirectory(path: String, verifier: FaceVerification, label: Int)
+fun processFaceDirectory(path: String, verifier: FaceVerification, label: Int): List<FaceData>
 {
     val qualityComputation = FaceQualityComputation()
 
@@ -92,41 +97,27 @@ fun processFaceDirectory(path: String, verifier: FaceVerification, label: Int)
 
         data
     }
+    return faceData
 }
 
-fun processVoiceDirectory(path: String, verifier: VoiceAuthenticator, label: Int)
+fun processVoiceDirectory(path: String, verifier: VoiceAuthenticator, label: Int): List<VoiceData>
 {
     val audioFiles = JavaCvUtils.getAllAudioFilesInDirectory(path)
 
-    audioFiles.forEach {
+    val voiceData = audioFiles.map {
         verifier.readWav(it.absolutePath)
         val featureVector = verifier.currentFeatureVector
-        val distance = verifier.identifySpeaker(featureVector)
-        println("\t  ${it.name}: $distance")
-    }
+        val distance = verifier.identifySpeaker(featureVector).toDouble()
 
-//    val containerImageFiles = imageFiles.filter { it.nameWithoutExtension.endsWith("_container") }
-//    val faceImageFiles = imageFiles.filter { it.nameWithoutExtension.endsWith("_face") }
-//
-//    val faceData = (containerImageFiles zip faceImageFiles).map {
-//        val face = Face(JavaCvUtils.imreadRgb(it.first.absolutePath),
-//                        it.first.absolutePath,
-//                        JavaCvUtils.imreadGray(it.second.absolutePath))
-//
-//        val distance = verifier.predict(face)
-//        val qualityBrightness = qualityComputation.computeBrightnessScore(face.containerImage)
-//        val qualityContrast = qualityComputation.computeContrastScore(face.faceImage)
-//        val qualitySharpness = qualityComputation.computeSharpnessScore(face.faceImage)
-//
-//        val data = FaceData(label,
-//                            distance,
-//                            qualityBrightness,
-//                            qualityContrast,
-//                            qualitySharpness)
-//        println("\t  ${it.first.nameWithoutExtension} - ${it.second.nameWithoutExtension}: $data")
-//
-//        data
-//    }
+        val qualityEnvAmplitude = it.nameWithoutExtension.split("_")[1].toDouble()
+
+        val data = VoiceData(label, distance, qualityEnvAmplitude)
+
+        println("\t  ${it.nameWithoutExtension}: $data")
+
+        data
+    }
+    return voiceData
 }
 
 
