@@ -7,13 +7,13 @@ import models.FaceData
 import models.VoiceData
 import voice.SerializeArray
 import voice.VoiceAuthenticator
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
-import java.util.logging.Logger
 
-val logger = Logger.getLogger("PrepareDataForMLP")
-val MODEL_DIR = "/home/ndtho8205/Desktop/BioDiaryData/train"
+val DIR = "/home/ndtho8205/Desktop/BioDiaryData/test"
+val OUTPUT_PATH = "$DIR/test_data.txt"
 
 /*
     .../train/
@@ -32,9 +32,11 @@ fun main(args: Array<String>)
     val faceVerifier = FaceVerification()
     val voiceVerifier = VoiceAuthenticator()
 
-    val path = Paths.get(MODEL_DIR)
+    val path = Paths.get(DIR)
     if (Files.isDirectory(path))
     {
+        val trainingDataFile = File(OUTPUT_PATH).printWriter()
+
         val directories = Files.list(path).filter { Files.isDirectory(it) }
         directories.forEach {
             println(it.fileName)
@@ -63,10 +65,17 @@ fun main(args: Array<String>)
                 val voiceData =
                         processVoiceDirectory(labelVoiceDirectoryPath, voiceVerifier, if (label == classname) 1 else 0)
 
+                for (i in faceData.indices)
+                    for (j in voiceData.indices)
+                    {
+                        val line = faceData[i].toString() + voiceData[j].toString().drop(1)
+                        trainingDataFile.println(line)
+                    }
+
             }
         }
+        trainingDataFile.close()
     }
-
 }
 
 fun processFaceDirectory(path: String, verifier: FaceVerification, label: Int): List<FaceData>

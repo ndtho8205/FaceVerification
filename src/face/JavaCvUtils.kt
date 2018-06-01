@@ -2,9 +2,9 @@ package face
 
 import org.bytedeco.javacpp.opencv_core.Mat
 import org.bytedeco.javacpp.opencv_core.MatVector
-import org.bytedeco.javacpp.opencv_imgcodecs.imread
-import org.bytedeco.javacpp.opencv_imgcodecs.imwrite
-import org.bytedeco.javacpp.opencv_imgproc.*
+import org.bytedeco.javacpp.opencv_imgcodecs.*
+import org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2RGB
+import org.bytedeco.javacpp.opencv_imgproc.cvtColor
 import java.io.File
 import java.io.FilenameFilter
 
@@ -14,14 +14,13 @@ object JavaCvUtils
     fun imreadRgb(imagePath: String): Mat
     {
         val img = imread(imagePath)
-        cvtColor(img, img, COLOR_RGB2BGR)
+        cvtColor(img, img, COLOR_BGR2RGB)
         return img
     }
 
     fun imreadGray(imagePath: String): Mat
     {
-        val img = imread(imagePath)
-        cvtColor(img, img, COLOR_BGR2GRAY)
+        val img = imread(imagePath, IMREAD_UNCHANGED)
         return img
     }
 
