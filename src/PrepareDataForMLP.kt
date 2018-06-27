@@ -12,8 +12,8 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 
-val DIR = "/home/ndtho8205/Desktop/BioDiaryData/test"
-val OUTPUT_PATH = "$DIR/test_data.txt"
+val DIR = "/home/ndtho8205/Desktop/BioDiaryData_2/train"
+val OUTPUT_PATH = "$DIR/train_data.txt"
 
 /*
     .../train/
@@ -92,10 +92,10 @@ fun processFaceDirectory(path: String, verifier: FaceVerification, label: Int): 
                         it.first.absolutePath,
                         JavaCvUtils.imreadGray(it.second.absolutePath))
 
-        val distance = verifier.predict(face)
-        val qualityBrightness = qualityComputation.computeBrightnessScore(face.containerImage)
-        val qualityContrast = qualityComputation.computeContrastScore(face.faceImage)
-        val qualitySharpness = qualityComputation.computeSharpnessScore(face.faceImage)
+        val distance = verifier.predict(face) / 8000.0
+        val qualityBrightness = qualityComputation.computeBrightnessScore(face.containerImage) / 255.0
+        val qualityContrast = (qualityComputation.computeContrastScore(face.faceImage) - 30.0) / 50.0
+        val qualitySharpness = (qualityComputation.computeSharpnessScore(face.faceImage) - 1.0) / 10.0
 
         val data = FaceData(label,
                             distance,
@@ -116,9 +116,9 @@ fun processVoiceDirectory(path: String, verifier: VoiceAuthenticator, label: Int
     val voiceData = audioFiles.map {
         verifier.readWav(it.absolutePath)
         val featureVector = verifier.currentFeatureVector
-        val distance = verifier.identifySpeaker(featureVector).toDouble()
+        val distance = verifier.identifySpeaker(featureVector).toDouble() / 250.0
 
-        val qualityEnvAmplitude = it.nameWithoutExtension.split("_")[1].toDouble()
+        val qualityEnvAmplitude = it.nameWithoutExtension.split("_")[1].toDouble() / 32767.0
 
         val data = VoiceData(label, distance, qualityEnvAmplitude)
 
