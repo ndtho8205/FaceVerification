@@ -1,8 +1,5 @@
 import edu.bk.thesis.biodiary.core.voice.math.vq.Codebook
-import face.Face
-import face.FaceQualityComputation
-import face.FaceVerification
-import face.JavaCvUtils
+import face.*
 import models.FaceData
 import models.VoiceData
 import voice.SerializeArray
@@ -12,8 +9,10 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 
-val DIR = "/home/ndtho8205/Desktop/BioDiaryData_2/train"
-val OUTPUT_PATH = "$DIR/train_data.txt"
+private val DIR = "/home/ndtho/Desktop/data/train"
+private val OUTPUT_PATH = "$DIR/train_data.txt"
+
+
 
 /*
     .../train/
@@ -78,7 +77,7 @@ fun main(args: Array<String>)
     }
 }
 
-fun processFaceDirectory(path: String, verifier: FaceVerification, label: Int): List<FaceData>
+private fun processFaceDirectory(path: String, verifier: FaceVerification, label: Int): List<FaceData>
 {
     val qualityComputation = FaceQualityComputation()
 
@@ -90,12 +89,12 @@ fun processFaceDirectory(path: String, verifier: FaceVerification, label: Int): 
     val faceData = (containerImageFiles zip faceImageFiles).map {
         val face = Face(JavaCvUtils.imreadRgb(it.first.absolutePath),
                         it.first.absolutePath,
-                        JavaCvUtils.imreadGray(it.second.absolutePath))
+                        ImagePreprocessing().equalizeHist(JavaCvUtils.imreadGray(it.second.absolutePath)))
 
-        val distance = verifier.predict(face) / 8000.0
-        val qualityBrightness = qualityComputation.computeBrightnessScore(face.containerImage) / 255.0
-        val qualityContrast = (qualityComputation.computeContrastScore(face.faceImage) - 30.0) / 50.0
-        val qualitySharpness = (qualityComputation.computeSharpnessScore(face.faceImage) - 1.0) / 10.0
+        val distance = verifier.predict(face)
+        val qualityBrightness = qualityComputation.computeBrightnessScore(face.containerImage)
+        val qualityContrast = qualityComputation.computeContrastScore(face.faceImage)
+        val qualitySharpness = qualityComputation.computeSharpnessScore(face.faceImage)
 
         val data = FaceData(label,
                             distance,
@@ -116,9 +115,9 @@ fun processVoiceDirectory(path: String, verifier: VoiceAuthenticator, label: Int
     val voiceData = audioFiles.map {
         verifier.readWav(it.absolutePath)
         val featureVector = verifier.currentFeatureVector
-        val distance = verifier.identifySpeaker(featureVector).toDouble() / 250.0
+        val distance = verifier.identifySpeaker(featureVector).toDouble()
 
-        val qualityEnvAmplitude = it.nameWithoutExtension.split("_")[1].toDouble() / 32767.0
+        val qualityEnvAmplitude = it.nameWithoutExtension.split("_")[1].toDouble()
 
         val data = VoiceData(label, distance, qualityEnvAmplitude)
 

@@ -4,7 +4,7 @@ import org.bytedeco.javacpp.DoublePointer
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.opencv_core.CV_32SC1
 import org.bytedeco.javacpp.opencv_core.Mat
-import org.bytedeco.javacpp.opencv_face.createEigenFaceRecognizer
+import org.bytedeco.javacpp.opencv_face.EigenFaceRecognizer
 import java.nio.IntBuffer
 
 class FaceVerification
@@ -20,7 +20,7 @@ class FaceVerification
 
     private val MODEL_FILENAME = "model_face.yml"
 
-    private val mRecognizer = createEigenFaceRecognizer(128, 10000.0)
+    private val mRecognizer = EigenFaceRecognizer.create(128, 10000.0)
 
     private var mIsTrained = false
 
@@ -28,7 +28,7 @@ class FaceVerification
     {
         mIsTrained = try
         {
-            mRecognizer.load(modelPath)
+            mRecognizer.read(modelPath)
             true
         }
         catch (e: Exception)
@@ -54,6 +54,7 @@ class FaceVerification
             val labels = generateLabels(faces)
 
             mRecognizer.train(JavaCvUtils.list2MatVector(faceImageList), labels)
+            mIsTrained = true
             true
         }
         catch (e: Exception)
